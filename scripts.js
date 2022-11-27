@@ -107,7 +107,7 @@ function render(barcodes_list) {
     tr.appendTo(barcodes);
     printArea.append(
       $("<div></div>").html(
-        $("<canvas width='140px' height='70px'></canvas>").EAN13(
+        $("<canvas width='150px' height='75px'></canvas>").EAN13(
           barcode,
           options
         )
@@ -118,5 +118,28 @@ function render(barcodes_list) {
 }
 
 function print() {
-  printArea.printThis();
+  if (barcodes_list.length > 0) {
+    printArea.printThis({
+      afterPrint: () => {
+        saveBarcodes();
+      },
+    });
+  } else {
+    alert("You need to generate barcodes before printing.");
+  }
+}
+
+function saveBarcodes() {
+  if (barcodes_list.length > 0) {
+    var a = document.createElement("a");
+    a.href = window.URL.createObjectURL(
+      new Blob([barcodes_list.join("\n")], {
+        type: "text/csv",
+      })
+    );
+    a.download = "barcodes.csv";
+    a.click();
+  } else {
+    alert("Nothing to save.");
+  }
 }
