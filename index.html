@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bootstrap demo</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container mt-2 shadow p-5">
+      <h3 class="display-5 text-center mb-5">EAN-13 Barcode Generator</h3>
+      <div class="row mb-3">
+        <label class="col-sm-3 col-form-label" for="num"
+          >How many to generate:</label
+        >
+        <div class="col-sm-4">
+          <input
+            type="number"
+            class="form-control"
+            min="10"
+            value="10"
+            id="num"
+          />
+        </div>
+        <div class="col-sm-4">
+          <button class="btn btn-outline-dark" onclick="generate()">
+            Generate
+          </button>
+          <button
+            class="btn btn-outline-primary"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#settings"
+            aria-controls="settings"
+          >
+            Settings
+          </button>
+          <button class="btn btn-outline-warning" onclick="">Print</button>
+        </div>
+      </div>
+      <!-- Barcodes List -->
+      <div class="row mb-3">
+        <h4>Barcodes list:</h4>
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Number</th>
+              <th class="text-end">Barcode</th>
+            </tr>
+          </thead>
+          <tbody id="barcodes"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Settings Offcanvas -->
+    <div
+      class="offcanvas offcanvas-start"
+      tabindex="-1"
+      id="settings"
+      aria-labelledby="settingsLabel"
+    >
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="settingsLabel">Settings</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" checked id="number" />
+          <label class="form-check-label" for="number"> Show number </label>
+        </div>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" checked id="prefix" />
+          <label class="form-check-label" for="prefix"> Show prefix </label>
+        </div>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="debug" />
+          <label class="form-check-label" for="debug"> Debug </label>
+        </div>
+
+        <div class="row mb-2">
+          <label for="color" class="col-sm-3 col-form-label me-2">Color</label>
+          <input
+            type="color"
+            class="form-control form-control-color"
+            id="color"
+            value="#000000"
+            title="Choose your color"
+          />
+        </div>
+
+        <div class="row mb-2">
+          <label for="background" class="col-sm-3 col-form-label me-2"
+            >Background</label
+          >
+          <input
+            type="color"
+            class="form-control form-control-color"
+            id="background"
+            value="#ffffff"
+            title="Choose your color"
+          />
+        </div>
+
+        <div class="row mb-2">
+          <label for="padding" class="col-sm-3 col-form-label me-2"
+            >Padding</label
+          >
+          <input
+            type="number"
+            class="form-control form-control-color"
+            id="padding"
+            value="0"
+          />
+        </div>
+        <button class="btn btn-outline-danger" onclick="reset()">Reset</button>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.1.min.js"
+      integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="jquery-ean13.js"></script>
+    <script src="ean13.js"></script>
+    <script>
+      const barcodes = $("#barcodes");
+      const defaultOptions = {
+        number: true,
+        prefix: true,
+        color: "#000000",
+        background: null,
+        debug: false,
+        padding: 0,
+        onSuccess: function (number) {}, // Fired if the checksum of the provided code is correct. Not used if a 12 digit code is provided.
+        onValid: function () {}, // Fired is the checksum is not correct. Not used if a 12 digit code is provided.
+        onInValid: function () {}, // Fired at the end of the painting process and if no errors occurred. Gives the number (including generated or provided checksum) as parameter.
+        onError: function () {}, // Fired if the were any errors while painting. (For instance the canvas element is not present)
+      };
+      var barcodes_list = [];
+      var options = {
+        number: true,
+        prefix: true,
+        color: "#000000",
+        background: null,
+        debug: false,
+        padding: 0,
+      };
+
+      function reset() {
+        options = defaultOptions;
+        $("#number").prop("checked", defaultOptions.number);
+        $("#prefix").prop("checked", defaultOptions.prefix);
+        $("#debug").prop("checked", defaultOptions.debug);
+        $("#color").val(defaultOptions.color);
+        $("#background").val("#ffffff");
+        $("#padding").val(defaultOptions.padding);
+        console.log("Rendering...");
+        render(barcodes_list);
+      }
+
+      $("#settings").on("change", "input", function (e) {
+        if ($(this).attr("type") == "checkbox") {
+          options[$(this).attr("id")] = $(this).is(":checked");
+        } else {
+          if ($(this).attr("id") === "padding") {
+            options[$(this).attr("id")] = $(this).val() * 1;
+          } else {
+            options[$(this).attr("id")] = $(this).val();
+          }
+        }
+        console.log("Rendering...");
+        render(barcodes_list);
+      });
+
+      function randomNumber(quantity, max) {
+        const arr = [];
+        while (arr.length < quantity) {
+          var candidateInt = Math.floor(Math.random() * max) + 1;
+          arr.push(candidateInt);
+        }
+        return arr;
+      }
+
+      function generateEAN13Code() {
+        const barcode = randomNumber(12, 9);
+        let x = (y = 0);
+        for (let i = 0; i < barcode.length; i++) {
+          if (i % 2 === 0) {
+            x += barcode[i];
+          } else {
+            y += barcode[i];
+          }
+        }
+        let z = (x + 3) * y;
+        const lastDigit = 10 - (z % 10);
+
+        barcode.push(lastDigit % 10);
+        return barcode;
+      }
+
+      function generate() {
+        let num = $("#num").val();
+        if (num <= 0) {
+          alert("Enter a postive number.");
+          return;
+        }
+        console.log(`Generating ${num} barcodes...`);
+        const list = [];
+        while (num > 0) {
+          list.push(generateEAN13Code().join(""));
+          num--;
+        }
+        barcodes_list = list;
+        console.log(`Generated barcodes:`, list);
+        console.log(`${$("#num").val()} barcodes being rendered...`);
+        render(barcodes_list);
+      }
+      function render(barcodes_list) {
+        barcodes.html("");
+        barcodes_list.forEach((barcode, index) => {
+          let tr = $("<tr></tr>");
+          tr.append($("<td></td>").text(index + 1));
+          tr.append($("<td></td>").text(barcode));
+          tr.append(
+            $("<td class='text-end'></td>").html(
+              $("<canvas></canvas>").EAN13(barcode, options)
+            )
+          );
+          tr.appendTo(barcodes);
+        });
+        console.log(`Finished rendering.`);
+      }
+    </script>
+  </body>
+</html>
