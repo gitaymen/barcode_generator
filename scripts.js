@@ -24,7 +24,7 @@ var options = {
 };
 
 function reset() {
-  options = defaultOptions;
+  options = { ...defaultOptions };
   $("#number").prop("checked", defaultOptions.number);
   $("#prefix").prop("checked", defaultOptions.prefix);
   $("#debug").prop("checked", defaultOptions.debug);
@@ -52,7 +52,7 @@ $("#settings").on("change", "input", function (e) {
 function randomNumber(quantity, max) {
   const arr = [];
   while (arr.length < quantity) {
-    var candidateInt = Math.floor(Math.random() * max) + 1;
+    var candidateInt = Math.floor(Math.random() * max);
     arr.push(candidateInt);
   }
   return arr;
