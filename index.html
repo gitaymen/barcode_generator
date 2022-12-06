@@ -15,10 +15,10 @@
     <div class="container mt-2 shadow p-5">
       <h3 class="display-5 text-center mb-5">EAN-13 Barcode Generator</h3>
       <div class="row mb-3">
-        <label class="col-sm-3 col-form-label" for="num"
+        <label class="col-sm-4 col-form-label="num"
           >How many to generate:</label
         >
-        <div class="col-sm-4">
+        <div class="col-sm-4 mb-2">
           <input
             type="number"
             class="form-control"
@@ -53,16 +53,18 @@
       <!-- Barcodes List -->
       <div class="row mb-3">
         <h4>Barcodes list:</h4>
-        <table class="table table-hover align-middle">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Number</th>
-              <th class="text-end">Barcode</th>
-            </tr>
-          </thead>
-          <tbody id="barcodes"></tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Number</th>
+                <th class="text-end">Barcode</th>
+              </tr>
+            </thead>
+            <tbody id="barcodes"></tbody>
+          </table>
+        </div>
       </div>
     </div>
     <!-- Settings Offcanvas -->
@@ -96,7 +98,7 @@
         </div>
 
         <div class="row mb-2">
-          <label for="color" class="col-sm-3 col-form-label me-2">Color</label>
+          <label for="color" class="col-sm-4 col-form-label">Color</label>
           <input
             type="color"
             class="form-control form-control-color"
@@ -107,7 +109,7 @@
         </div>
 
         <div class="row mb-2">
-          <label for="background" class="col-sm-3 col-form-label me-2"
+          <label for="background" class="col-sm-4 col-form-label"
             >Background</label
           >
           <input
@@ -120,7 +122,7 @@
         </div>
 
         <div class="row mb-2">
-          <label for="padding" class="col-sm-3 col-form-label me-2"
+          <label for="padding" class="col-sm-4 col-form-label"
             >Padding</label
           >
           <input
@@ -129,6 +131,21 @@
             id="padding"
             value="0"
           />
+        </div>
+        <div class="row mb-2">
+          <label for="country" class="col-sm-4 col-form-label"
+            >Country Code</label
+          >
+          <div class="col-sm-8 ps-0">
+            <select
+              class="form-select"
+              aria-label="Country Code"
+              id="country"
+              disabled
+            >
+              <option selected>Coming soon...</option>
+            </select>
+          </div>
         </div>
         <button class="btn btn-outline-danger" onclick="reset()">Reset</button>
       </div>

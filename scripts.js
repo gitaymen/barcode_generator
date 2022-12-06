@@ -60,18 +60,12 @@ function randomNumber(quantity, max) {
 
 function generateEAN13Code() {
   const barcode = randomNumber(12, 9);
-  let x = (y = 0);
-  for (let i = 0; i < barcode.length; i++) {
-    if (i % 2 === 0) {
-      x += barcode[i];
-    } else {
-      y += barcode[i];
-    }
+  let checksum = 0;
+  for (let i = 1; i <= barcode.length; i++) {
+    checksum += barcode[i - 1] * (i % 2 === 0 ? 3 : 1);
   }
-  let z = (x + 3) * y;
-  const lastDigit = 10 - (z % 10);
-
-  barcode.push(lastDigit % 10);
+  const lastDigit = (10 - (checksum % 10)) % 10;
+  barcode.push(lastDigit);
   return barcode;
 }
 
